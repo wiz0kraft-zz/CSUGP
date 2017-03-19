@@ -12,6 +12,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2
+import math
 
 # local modules
 from video import create_capture
@@ -46,7 +47,7 @@ if __name__ == '__main__':
     cascade = cv2.CascadeClassifier(cascade_fn)
     nested = cv2.CascadeClassifier(nested_fn)
 
-    cam = cv2.VideoCapture('/home/wizkraft/Videos/NarcosS01E01.mkv')
+    cam = cv2.VideoCapture('/home/wizkraft/Videos/NarcosS01E03.mkv')
     i=0;
     j=1;
     while True:
@@ -57,12 +58,20 @@ if __name__ == '__main__':
         t = clock()
         if i%5 == 0:
             rects = detect(gray, cascade)
-            #print(rects)
-            #crop_img = img(rects)
-            #crop_img.save('_0.png')
             if not type(rects) is list : 
                 crop_img = img[rects[0,1]:rects[0,3], rects[0,0]:rects[0,2]]
-                cv2.imwrite("/home/wizkraft/Desktop/Faces/NarcosS01E01/"+str(j)+".png",crop_img)
+                cv2.imwrite("/home/wizkraft/Desktop/Faces/StrangerThingsS01E01/"+str(j)+".jpg",crop_img)
+                a = rects[0,1] + int(0.07*(rects[0,3]-rects[0,1]))
+                b = rects[0,3] - int(0.07*(rects[0,3]-rects[0,1]))
+                c = rects[0,0] + int(0.07*(rects[0,2]-rects[0,0]))
+                d = rects[0,2] - int(0.07*(rects[0,2]-rects[0,0]))
+                crop = img[a:b, c:d]
+                height, width, channels = crop.shape
+                f = 100.0/height
+                pre = cv2.resize(crop,None,fx=f, fy=f, interpolation = cv2.INTER_AREA)
+                pre = cv2.cvtColor(pre, cv2.COLOR_BGR2GRAY)
+                result = cv2.equalizeHist(pre)
+                cv2.imwrite("/home/wizkraft/Desktop/Faces/Final/StrangerThingsS01E01/"+str(j)+".jpg",result)              
                 j = j+1
         vis = img.copy()
         draw_rects(vis, rects, (0, 255, 0))
